@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../user_data_service.dart';
 
 /// Unified interest / topic chip styling for visual coherence across the app.
 /// Transparent background, gradient-based text color (violet -> red), subtle border.
@@ -24,17 +23,12 @@ class InterestChip extends StatelessWidget {
   });
 
   Color _colorFor(String tag) {
-    final service = UserDataService();
-    final counts = service.getHashtagCounts();
-    if (counts.isEmpty) return const Color(0xFF8A2BE2);
-    final lower = tag.toLowerCase();
-    final values = counts.values;
-    int min = values.reduce((a,b)=> a < b ? a : b);
-    int max = values.reduce((a,b)=> a > b ? a : b);
-    final c = counts[lower] ?? min;
-    final t = max == min ? 0.5 : (c - min) / (max - min);
-    const cool = Color(0xFF8A2BE2);
-    const warm = Color(0xFFFF5252);
+    // Use a deterministic color based on tag hash for consistent coloring
+    final lower = tag.toLowerCase().replaceAll('#', '');
+    final hash = lower.hashCode.abs();
+    final t = (hash % 100) / 100.0; // 0.0 to 1.0 based on tag
+    const cool = Color(0xFF8A2BE2); // blue-violet
+    const warm = Color(0xFFFF5252); // warm red
     return Color.lerp(cool, warm, t)!;
   }
 

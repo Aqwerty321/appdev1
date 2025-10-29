@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'globals.dart';
 import 'user_data_service.dart';
+import 'firestore_service.dart';
 import 'search_results_screen.dart';
 import 'dart:math' as math;
 
@@ -19,8 +20,6 @@ class HashtagWallScreen extends StatefulWidget {
 }
 
 class _HashtagWallScreenState extends State<HashtagWallScreen> with SingleTickerProviderStateMixin {
-  final UserDataService _service = UserDataService();
-
   static const Color _darkBlue = Color.fromARGB(255, 19, 35, 63);
   static const Color _lightBlue = Color.fromARGB(255, 129, 167, 238);
 
@@ -136,10 +135,33 @@ class _HashtagWallScreenState extends State<HashtagWallScreen> with SingleTicker
 
   @override
   Widget build(BuildContext context) {
-    final counts = _service.getHashtagCounts();
-    final entries = counts.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
+    final FirestoreService _firestoreService = FirestoreService();
+    return StreamBuilder<List<BuddyProfile>>(
+      stream: _firestoreService.watchAllUsers(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Scaffold(
+            backgroundColor: Colors.black,
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        final allUsers = snapshot.data!;
+        // Calculate hashtag counts from real users
+        final Map<String, int> counts = {};
+        for (final user in allUsers) {
+          for (final tag in user.interests) {
+            final key = tag.toLowerCase();
+            counts[key] = (counts[key] ?? 0) + 1;
+          }
+        }
+        final entries = counts.entries.toList()
+          ..sort((a, b) => b.value.compareTo(a.value));
+        return _buildHashtagWall(context, entries);
+      },
+    );
+  }
 
+  Widget _buildHashtagWall(BuildContext context, List<MapEntry<String, int>> entries) {
     final maxCount = entries.isNotEmpty ? entries.first.value : 1;
     final minCount = entries.isNotEmpty ? entries.last.value : 1;
 
