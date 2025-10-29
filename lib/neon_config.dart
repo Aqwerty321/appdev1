@@ -193,7 +193,7 @@ Future<void> showNeonConfigSheet(BuildContext context) async {
                         onChanged: (v) => update(settings.copyWith(backdropBlur: v)),
                         title: const Text('Backdrop Blur Enabled', style: TextStyle(color: Colors.white70, fontSize: 13)),
                         contentPadding: EdgeInsets.zero,
-                        activeColor: const Color(0xFF6BD1FF),
+                        activeThumbColor: const Color(0xFF6BD1FF),
                       ),
                       slider(
                         label: 'Stroke',
@@ -225,7 +225,7 @@ Future<void> showNeonConfigSheet(BuildContext context) async {
                         onChanged: (v) => update(settings.copyWith(gradientTilt: v)),
                         title: const Text('Gradient Tilt', style: TextStyle(color: Colors.white70, fontSize: 13)),
                         contentPadding: EdgeInsets.zero,
-                        activeColor: const Color(0xFF6BD1FF),
+                        activeThumbColor: const Color(0xFF6BD1FF),
                       ),
                       SwitchListTile(
                         dense: true,
@@ -233,7 +233,7 @@ Future<void> showNeonConfigSheet(BuildContext context) async {
                         onChanged: (v) => update(settings.copyWith(cometBorder: v)),
                         title: const Text('Comet Border', style: TextStyle(color: Colors.white70, fontSize: 13)),
                         contentPadding: EdgeInsets.zero,
-                        activeColor: const Color(0xFF6BD1FF),
+                        activeThumbColor: const Color(0xFF6BD1FF),
                       ),
                     ] else
                       const Text('Limited controls for Lite / Off presets.', style: TextStyle(color: Colors.white38, fontSize: 12)),

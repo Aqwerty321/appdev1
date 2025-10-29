@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'profile_screen.dart';
 import 'widgets/neon_border_tile.dart';
 import 'globals.dart';
+import 'config.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:ui' as ui show ImageFilter; // alias to avoid any shadowing
@@ -87,11 +88,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return MouseRegion(
       onHover: (event) => globalMousePosition.value = event.position,
       child: Scaffold(
-        backgroundColor: Colors.black, // Changed for consistency
+        backgroundColor: AppConfig.darkBlue,
         appBar: AppBar(
-          title: const Text('Find A StudyBuddy!',
-              style: TextStyle(color: Color.fromARGB(255, 129, 167, 238))),
-          backgroundColor: const Color.fromARGB(255, 19, 35, 63),
+          title: Text(AppConfig.appName,
+              style: TextStyle(color: AppConfig.lightBlue)),
+          backgroundColor: AppConfig.darkBlue,
           iconTheme: const IconThemeData(color: Colors.white),
         ),
         drawer: NavigationDrawer(
@@ -169,9 +170,9 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
-                _getGreeting(),
-                style: const TextStyle(
-                  color: Colors.white54,
+                AppConfig.showTimeBasedGreeting ? _getGreeting() : AppConfig.staticGreeting,
+                style: TextStyle(
+                  color: AppConfig.secondaryTextColor,
                   fontSize: 28,
                   fontWeight: FontWeight.w300,
                 ),
@@ -210,11 +211,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    'Discover Buddies',
+                  Text(
+                    AppConfig.discoverBuddiesTitle,
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 48,
+                      color: AppConfig.primaryTextColor,
+                      fontSize: AppConfig.headingFontSize,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -222,14 +223,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             // Hint quote under the heading
-            const Padding(
-              padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 6.0),
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 6.0),
               child: Text(
-                '“O brave new world, that has such study mates in’t.”',
+                AppConfig.discoverBuddiesQuote,
                 style: TextStyle(
-                  color: Colors.white70,
+                  color: AppConfig.secondaryTextColor,
                   fontStyle: FontStyle.italic,
-                  fontSize: 14,
+                  fontSize: AppConfig.smallFontSize,
                 ),
               ),
             ),
@@ -347,23 +348,23 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Find by Interest',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 48,
-                      fontWeight: FontWeight.w700,
+                    Text(
+                      AppConfig.findByInterestTitle,
+                      style: TextStyle(
+                        color: AppConfig.primaryTextColor,
+                        fontSize: AppConfig.headingFontSize,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    '“Our interests be the stars to steer by—seek and ye shall find.”',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontStyle: FontStyle.italic,
-                      fontSize: 14,
+                    const SizedBox(height: 6),
+                    Text(
+                      AppConfig.findByInterestQuote,
+                      style: TextStyle(
+                        color: AppConfig.secondaryTextColor,
+                        fontStyle: FontStyle.italic,
+                        fontSize: AppConfig.smallFontSize,
+                      ),
                     ),
-                  ),
                   const SizedBox(height: 14),
                   Row(
                     children: const [
@@ -452,12 +453,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       final sorted = counts.entries.toList()
                         ..sort((a, b) => b.value.compareTo(a.value));
 
-                      if (sorted.isEmpty) {
-                        return const Text(
-                          'No tags available yet.',
-                          style: TextStyle(color: Colors.white54),
-                        );
-                      }
+                        if (sorted.isEmpty) {
+                          return Text(
+                            AppConfig.noTagsAvailableMessage,
+                            style: TextStyle(color: AppConfig.secondaryTextColor),
+                          );
+                        }
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
