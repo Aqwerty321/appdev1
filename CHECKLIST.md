@@ -7,6 +7,7 @@ Before running your app, make sure you've completed these steps:
 ### 🔥 Firebase Configuration
 
 - [ ] **Firebase project created** at [console.firebase.google.com](https://console.firebase.google.com)
+- [ ] **Blaze plan enabled** (required for Cloud Functions and external API calls)
 - [ ] **Authentication enabled:**
   - Go to Authentication → Sign-in method
   - Enable "Email/Password"
@@ -16,6 +17,9 @@ Before running your app, make sure you've completed these steps:
 - [ ] **Storage bucket created:**
   - Go to Storage → Get started
   - Start in test mode
+- [ ] **Cloud Functions enabled:**
+  - Functions deploy successfully
+  - See `findStudyBuddyMatches` and `getConversationStarters` in console
 
 ### 🛡️ Security Rules Applied
 
@@ -31,6 +35,29 @@ Before running your app, make sure you've completed these steps:
   - Click "Publish"
   - Wait for confirmation
 
+### 🤖 AI Matchmaking Configuration
+
+- [ ] **Gemini API key obtained:**
+  - Get from [Google AI Studio](https://aistudio.google.com/app/apikey)
+  - Free tier: 2M tokens/day
+  
+- [ ] **API key set in Firebase:**
+  ```bash
+  firebase functions:secrets:set GEMINI_API_KEY
+  ```
+  
+- [ ] **Cloud Functions deployed:**
+  ```bash
+  cd functions
+  npm install
+  cd ..
+  firebase deploy --only functions
+  ```
+  
+- [ ] **Functions accessible:**
+  - Test in Firebase Console → Functions
+  - No errors in function logs
+
 ### 📱 App Configuration
 
 - [ ] **Firebase config files present:**
@@ -42,12 +69,14 @@ Before running your app, make sure you've completed these steps:
   ```bash
   flutter pub get
   ```
+  
+- [ ] **Cloud Functions package added:**
+  - `cloud_functions: ^6.0.1` in pubspec.yaml
 
 - [ ] **No compilation errors:**
   ```bash
   flutter analyze --no-fatal-infos
   ```
-  Should show "56 issues found" (all info-level warnings)
 
 ---
 
@@ -80,7 +109,31 @@ Before running your app, make sure you've completed these steps:
   - Firestore → `users/{uid}` → name/bio/interests updated
   - Storage → `profile_images/{uid}.jpg` exists
 
-### Phase 3: Study Groups
+### Phase 3: AI Matchmaking
+
+- [ ] **Navigate to Home screen (Discover Buddies)**
+- [ ] **Check for AI indicator:**
+  - Yellow loading circle appears (briefly)
+  - Brain icon (🧠) appears when loaded
+  - Hover shows "AI match scores loaded"
+- [ ] **Check buddy cards:**
+  - Each card shows "XX% Match"
+  - Percentages are NOT all 0%
+  - Scores range from 50-100%
+- [ ] **Navigate to AI Matchmaking screen:**
+  - Drawer → ✨ AI Matchmaking
+  - See detailed match list with explanations
+  - AI reasoning displayed for each match
+- [ ] **Check browser console (F12):**
+  - See "🚀 Fetching AI match scores..."
+  - See "✅ Received X matches from AI service"
+  - See "📊 AI Match: username (userId) = XX%"
+  - No errors in console
+- [ ] **Verify in Firebase Console:**
+  - Functions → Logs show successful executions
+  - No "Null check operator" errors
+
+### Phase 4: Study Groups
 
 - [ ] **Navigate to Study Groups tab**
 - [ ] **Create new group:**
@@ -94,7 +147,7 @@ Before running your app, make sure you've completed these steps:
   - Firestore → `study_groups` collection has new document
   - `memberUids` array contains your UID
 
-### Phase 4: Multi-User Testing
+### Phase 5: Multi-User Testing
 
 **Open second browser/incognito:**
 
@@ -106,7 +159,7 @@ Before running your app, make sure you've completed these steps:
   - `memberUids` array has both UIDs
   - `memberNames` array has both names
 
-### Phase 5: Messaging
+### Phase 6: Messaging
 
 - [ ] **Both users: Open same group detail screen**
 - [ ] **User 1: Send message "Hello!"**
@@ -115,7 +168,7 @@ Before running your app, make sure you've completed these steps:
 - [ ] **User 2: Navigate away and back to see message**
   - (Real-time update pending StreamBuilder integration)
 
-### Phase 6: Message Features
+### Phase 7: Message Features
 
 - [ ] **Edit your own message:**
   - Click edit icon
@@ -129,13 +182,13 @@ Before running your app, make sure you've completed these steps:
   - Message has `editedAt` timestamp
   - `reactions` array has your reaction
 
-### Phase 7: Group Management
+### Phase 8: Group Management
 
 - [ ] **Leave group** (both users)
 - [ ] **Verify in Firebase Console:**
   - Group document auto-deleted when empty
 
-### Phase 8: Logout & Re-login
+### Phase 9: Logout & Re-login
 
 - [ ] **Click logout in drawer**
 - [ ] **Redirected to login screen**
