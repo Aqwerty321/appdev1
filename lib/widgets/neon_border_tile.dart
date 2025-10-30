@@ -59,11 +59,11 @@ class NeonBorderLiteTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Preset lite style
+    // Preset lite style with improved colors
     const LinearGradient gradient = LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
-      colors: [Color(0xFF201D49), Color(0xFF211B79)],
+      colors: [Color(0xFF1A0E3E), Color(0xFF0D1B3A)], // Updated gradient
     );
     return Container(
       width: width,
@@ -73,8 +73,8 @@ class NeonBorderLiteTile extends StatelessWidget {
         gradient: gradient,
         boxShadow: [
           BoxShadow(
-            color: const Color.fromARGB(255, 148, 0, 255).withOpacity(0.22 * 0.6),
-            blurRadius: 14,
+            color: const Color(0xFFB366FF).withOpacity(0.25), // Vibrant purple glow
+            blurRadius: 16,
             spreadRadius: 2,
           ),
         ],
@@ -85,7 +85,7 @@ class NeonBorderLiteTile extends StatelessWidget {
           padding: padding,
           decoration: BoxDecoration(
             border: Border.all(
-              color: const Color(0xFF6BD1FF).withOpacity(0.25),
+              color: const Color(0xFF00D9FF).withOpacity(0.35), // Brighter cyan border
               width: 1.2,
             ),
             gradient: gradient,

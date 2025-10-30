@@ -5,12 +5,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 // Optional models to support searching and hashtag wall
 class BuddyProfile {
+  String userId;
   String name;
   String imageUrl;
   String bio;
   int matchPercentage;
   Set<String> interests;
   BuddyProfile({
+    required this.userId,
     required this.name,
     required this.imageUrl,
     required this.bio,
@@ -88,6 +90,7 @@ class UserDataService {
   late final List<BuddyProfile> allProfiles = [
     // Index 0 mirrors the current user; keep in sync on updates
     BuddyProfile(
+      userId: 'current-user',
       name: currentUser.name,
       imageUrl: 'https://picsum.photos/seed/me/200',
       bio: currentUser.bio,
@@ -103,6 +106,7 @@ class UserDataService {
       final match = 95 - (idx * 2);
       final interests = _generateInterests(idx);
       return BuddyProfile(
+        userId: 'demo-user-$idx',
         name: name,
         imageUrl: imageUrl,
         bio: bio,
@@ -305,7 +309,7 @@ class UserDataService {
     final g = _groups.where((e) => e.id == groupId).firstOrNull;
     if (g == null) return;
     if (!g.isAdmin(currentUser.name)) return;
-    final target = allProfiles.firstWhere((p) => p.name == profileName, orElse: () => BuddyProfile(name: '', imageUrl: '', bio: '', matchPercentage: 0, interests: {}));
+    final target = allProfiles.firstWhere((p) => p.name == profileName, orElse: () => BuddyProfile(userId: '', name: '', imageUrl: '', bio: '', matchPercentage: 0, interests: {}));
     if (target.name.isEmpty) return;
     g.memberNames.add(target.name);
     _persistGroups();

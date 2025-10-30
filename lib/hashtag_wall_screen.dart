@@ -173,14 +173,18 @@ class _HashtagWallScreenState extends State<HashtagWallScreen> with SingleTicker
 
     Color colorFor(int n) {
       if (maxCount == minCount) {
-        // Default mid tone between cool and warm when all equal
-        return const Color(0xFFB444FF);
+        // Default vibrant purple when all equal
+        return const Color(0xFFB366FF);
       }
       final t = (n - minCount) / (maxCount - minCount);
-      // Cool (violet) -> Warm (red)
-      const cool = Color(0xFF8A2BE2); // blue-violet
-      const warm = Color(0xFFFF5252); // warm red
-      return Color.lerp(cool, warm, t) ?? warm;
+      // Vibrant gradient: Cyan -> Purple -> Pink
+      if (t < 0.5) {
+        // Cyan to Purple
+        return Color.lerp(const Color(0xFF00D9FF), const Color(0xFFB366FF), t * 2) ?? const Color(0xFFB366FF);
+      } else {
+        // Purple to Pink
+        return Color.lerp(const Color(0xFFB366FF), const Color(0xFFFF2E97), (t - 0.5) * 2) ?? const Color(0xFFFF2E97);
+      }
     }
 
     return MouseRegion(

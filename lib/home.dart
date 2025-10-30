@@ -15,6 +15,8 @@ import 'study_group_detail_screen.dart';
 import 'widgets/neon_home_icon_painter.dart';
 import 'widgets/interest_chip.dart';
 import 'auth_service.dart';
+import 'ai_matchmaking_screen.dart';
+import 'ai_matchmaking_service.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -30,7 +32,14 @@ class _HomeScreenState extends State<HomeScreen> {
   static const Color _neonPurple = Color(0xFF986AF0);
   final UserDataService _service = UserDataService();
   final FirestoreService _firestoreService = FirestoreService();
+  final AiMatchmakingService _aiService = AiMatchmakingService();
   final Set<String> _selectedTags = {};
+  
+  // Cache AI match scores to avoid excessive API calls
+  Map<String, int> _matchScores = {};
+  bool _matchScoresLoading = false;
+  DateTime? _matchScoresCacheTime;
+  static const Duration _cacheExpiry = Duration(minutes: 30);
   // Removed per-screen heat cache; InterestChip manages color derivation globally.
 
   void _toggleTag(String tag, bool selected) {
@@ -41,6 +50,62 @@ class _HomeScreenState extends State<HomeScreen> {
         _selectedTags.remove(tag.toLowerCase());
       }
     });
+    // Fetch fresh match scores when filters change
+    _fetchMatchScores();
+  }
+
+  /// Fetch AI match scores for all users (cached for 30 minutes)
+  Future<void> _fetchMatchScores() async {
+    // Check if cache is still valid
+    if (_matchScoresCacheTime != null && 
+        DateTime.now().difference(_matchScoresCacheTime!) < _cacheExpiry) {
+      return; // Use cached data
+    }
+
+    if (_matchScoresLoading) return; // Prevent duplicate requests
+
+    setState(() => _matchScoresLoading = true);
+
+    try {
+      final currentUser = _service.currentUser;
+      print('🔍 Current user interests: ${currentUser.interests}');
+      print('🔍 Current user bio: ${currentUser.bio}');
+      
+      if (currentUser.interests.isEmpty) {
+        // Skip if user has no interests set
+        print('⚠️ User has no interests set - skipping AI matching');
+        setState(() => _matchScoresLoading = false);
+        return;
+      }
+
+      print('🚀 Fetching AI match scores...');
+      final matches = await _aiService.findMatches(
+        interests: currentUser.interests,
+        bio: currentUser.bio,
+      );
+      
+      print('✅ Received ${matches.length} matches from AI service');
+      
+      final newScores = <String, int>{};
+      for (var match in matches) {
+        // Use userId for matching (more reliable than name)
+        newScores[match.userId] = match.matchScore;
+        print('📊 AI Match: ${match.name} (userId: ${match.userId}) = ${match.matchScore}%');
+      }
+      
+      print('💾 Total AI match scores cached: ${newScores.length}');
+      print('💾 Cache keys: ${newScores.keys.toList()}');
+      
+      setState(() {
+        _matchScores = newScores;
+        _matchScoresCacheTime = DateTime.now();
+        _matchScoresLoading = false;
+      });
+    } catch (e, stackTrace) {
+      print('❌ Error fetching match scores: $e');
+      print('Stack trace: $stackTrace');
+      setState(() => _matchScoresLoading = false);
+    }
   }
 
   // Per-tag color logic handled by unified InterestChip widget now.
@@ -67,6 +132,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _cardScrollController = ScrollController();
+    // Fetch AI match scores on initial load
+    _fetchMatchScores();
     // The randomBios list is now initialized above, so it's removed from here.
   }
 
@@ -100,21 +167,21 @@ class _HomeScreenState extends State<HomeScreen> {
           children: <Widget>[
             ListTile(
               leading: CustomPaint(
-                painter: NeonHomeIconPainter(color: const Color(0xFF00BFFF)),
+                painter: NeonHomeIconPainter(color: const Color(0xFF00D9FF)), // Bright cyan
                 size: const Size(24, 24),
               ),
               title: const Text('Home',
                   style: TextStyle(
-                      color: Color.fromARGB(255, 129, 167, 238),
+                      color: Color(0xFF00D9FF),
                       fontSize: 24)),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.person, color: Colors.tealAccent),
+              leading: const Icon(Icons.person, color: Color(0xFFB366FF)), // Vibrant purple
               title: const Text('Profile',
-                  style: TextStyle(color: Color.fromARGB(255, 129, 167, 238))),
+                  style: TextStyle(color: Color(0xFF00D9FF))),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
@@ -125,9 +192,21 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.tag, color: Colors.purpleAccent),
+              leading: const Icon(Icons.auto_awesome, color: Color(0xFFFFB800)), // AI icon with amber
+              title: const Text('AI Matchmaking',
+                  style: TextStyle(color: Color(0xFF00D9FF))),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AiMatchmakingScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.tag, color: Color(0xFFFF2E97)), // Electric pink
               title: const Text('Hashtag Wall',
-                  style: TextStyle(color: Color.fromARGB(255, 129, 167, 238))),
+                  style: TextStyle(color: Color(0xFF00D9FF))),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
@@ -137,9 +216,9 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.group, color: Colors.lightGreenAccent),
+              leading: const Icon(Icons.group, color: Color(0xFF00FF94)), // Success green
               title: const Text('Study Groups',
-                  style: TextStyle(color: Color.fromARGB(255, 129, 167, 238))),
+                  style: TextStyle(color: Color(0xFF00D9FF))),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
@@ -219,6 +298,25 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  const SizedBox(width: 12),
+                  if (_matchScoresLoading)
+                    const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Color(0xFFFFB800),
+                        strokeWidth: 2,
+                      ),
+                    )
+                  else if (_matchScores.isNotEmpty)
+                    Tooltip(
+                      message: 'AI match scores loaded (${_matchScores.length} users)',
+                      child: const Icon(
+                        Icons.psychology,
+                        color: Color(0xFFFFB800),
+                        size: 24,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -296,8 +394,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           final buddyName = p.name;
                           final buddyImageUrl = p.imageUrl;
                           final buddyBio = p.bio;
-                          final buddyMatch = p.matchPercentage;
+                          // Use AI-calculated match score from cache
+                          final buddyMatch = _matchScores[p.userId] ?? 0;
                           final interests = p.interests;
+                          
+                          if (index == 0) {
+                            print('🎴 Top carousel card - Name: $buddyName, UserId: ${p.userId}, Match: $buddyMatch%');
+                          }
 
                           return Container(
                             width: 300,
@@ -557,6 +660,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                             itemBuilder: (context, idx) {
                               final p = filtered[idx];
+                              // Get AI-calculated match score from cache using userId
+                              final aiMatchScore = _matchScores[p.userId] ?? 0;
+                              
+                              if (idx == 0) {
+                                print('🃏 First buddy card - Name: ${p.name}, UserId: ${p.userId}, Match: $aiMatchScore%');
+                                print('🃏 Available match scores: ${_matchScores.length} entries');
+                                print('🃏 Looking for userId "${p.userId}" in cache...');
+                                print('🃏 Cache contains: ${_matchScores.keys.take(3).join(", ")}...');
+                              }
+                              
                               return Container(
                                 width: 300,
                                 margin: const EdgeInsets.only(right: 16),
@@ -569,7 +682,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           name: p.name,
                                           imageUrl: p.imageUrl,
                                           bio: p.bio,
-                                          matchPercentage: p.matchPercentage,
+                                          matchPercentage: aiMatchScore,
                                           interests: p.interests,
                                         ),
                                       ),
@@ -579,7 +692,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     name: p.name,
                                     imageUrl: p.imageUrl,
                                     bio: p.bio,
-                                    matchPercentage: p.matchPercentage,
+                                    matchPercentage: aiMatchScore,
                                     interests: p.interests,
                                     tileHeight: cardHeight,
                                   ),
@@ -787,13 +900,14 @@ class BuddyProfileCard extends StatefulWidget {
 class _BuddyProfileCardState extends State<BuddyProfileCard>
     with AutomaticKeepAliveClientMixin { // ✅ 1. Add the mixin
 
-  // --- Theme definitions can be moved here or kept outside ---
+  // --- Theme definitions with improved colors ---
   static const TextStyle _neonTextStyle = TextStyle(
-    color: Color.fromARGB(255, 181, 141, 255),
+    color: Color(0xFFB366FF), // Vibrant purple
     fontSize: 16,
     fontWeight: FontWeight.bold,
     shadows: [
-      Shadow(blurRadius: 4.0, color: Colors.black54, offset: Offset(2.0, 2.0)),
+      Shadow(blurRadius: 6.0, color: Color(0xFF6B00B3), offset: Offset(0, 2.0)), // Purple glow shadow
+      Shadow(blurRadius: 12.0, color: Color(0xFFB366FF), offset: Offset(0, 0)), // Outer glow
     ],
   );
   
@@ -814,7 +928,7 @@ class _BuddyProfileCardState extends State<BuddyProfileCard>
         height: widget.tileHeight,
         padding: const EdgeInsets.all(16),
         gradient: const LinearGradient(
-          colors: [Color.fromARGB(255, 32, 29, 73), Color.fromARGB(255, 33, 27, 121)],
+          colors: [Color(0xFF1A0E3E), Color(0xFF0D1B3A)], // Updated to match config
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

@@ -139,6 +139,7 @@ class FirestoreService {
         final data = doc.data() as Map<String, dynamic>;
         final imageUrl = data['imageUrl'] as String? ?? '';
         return BuddyProfile(
+          userId: doc.id, // Include Firestore document ID
           name: data['name'] ?? 'Unknown',
           imageUrl: imageUrl,
           bio: data['bio'] ?? '',

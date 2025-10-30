@@ -23,13 +23,25 @@ class InterestChip extends StatelessWidget {
   });
 
   Color _colorFor(String tag) {
-    // Use a deterministic color based on tag hash for consistent coloring
+    // Use a deterministic color based on tag hash for vibrant, varied coloring
     final lower = tag.toLowerCase().replaceAll('#', '');
     final hash = lower.hashCode.abs();
     final t = (hash % 100) / 100.0; // 0.0 to 1.0 based on tag
-    const cool = Color(0xFF8A2BE2); // blue-violet
-    const warm = Color(0xFFFF5252); // warm red
-    return Color.lerp(cool, warm, t)!;
+    
+    // Multi-stop gradient: Cyan -> Purple -> Pink -> Orange
+    if (t < 0.33) {
+      // Cyan to Purple
+      final localT = t / 0.33;
+      return Color.lerp(const Color(0xFF00D9FF), const Color(0xFFB366FF), localT)!;
+    } else if (t < 0.66) {
+      // Purple to Pink
+      final localT = (t - 0.33) / 0.33;
+      return Color.lerp(const Color(0xFFB366FF), const Color(0xFFFF2E97), localT)!;
+    } else {
+      // Pink to Orange
+      final localT = (t - 0.66) / 0.34;
+      return Color.lerp(const Color(0xFFFF2E97), const Color(0xFFFF8C00), localT)!;
+    }
   }
 
   @override
@@ -41,7 +53,7 @@ class InterestChip extends StatelessWidget {
         ? (tag.startsWith('#') ? tag : '#$tag')
         : tag; // allow raw label without '#'
     final color = _colorFor(tag.replaceAll('#',''));
-    const neonSelected = Color(0xFF986AF0);
+    const neonSelected = Color(0xFFB366FF); // Updated to match new purple
     final baseFont = compact ? 11.0 : 13.0;
     final textStyle = TextStyle(
       color: color,

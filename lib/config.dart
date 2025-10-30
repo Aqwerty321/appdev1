@@ -28,29 +28,38 @@ class AppConfig {
   
   // ==================== COLORS & THEME ====================
   
-  /// Primary background color
-  static const Color darkBlue = Color(0xFF13233F);
+  /// Primary background color - Deep rich navy
+  static const Color darkBlue = Color(0xFF0A1628);
   
-  /// Secondary background color
-  static const Color darkBlueLight = Color(0xFF1A2F4D);
+  /// Secondary background color - Slightly lighter navy
+  static const Color darkBlueLight = Color(0xFF142844);
   
-  /// Accent color 1 (purple/violet for highlights)
-  static const Color neonPurple = Color(0xFF986AF0);
+  /// Accent color 1 (purple/violet for highlights) - Vibrant electric purple
+  static const Color neonPurple = Color(0xFFB366FF);
   
-  /// Accent color 2 (light blue for buttons, icons)
-  static const Color lightBlue = Color(0xFF81A7EE);
+  /// Accent color 2 (cyan/blue for buttons, icons) - Bright cyan
+  static const Color lightBlue = Color(0xFF00D9FF);
   
-  /// Text color for primary content
-  static const Color primaryTextColor = Colors.white;
+  /// Accent color 3 (pink for special highlights) - Electric pink
+  static const Color accentPink = Color(0xFFFF2E97);
   
-  /// Text color for secondary content
-  static const Color secondaryTextColor = Colors.white70;
+  /// Success/positive color - Vibrant green
+  static const Color successGreen = Color(0xFF00FF94);
   
-  /// Card gradient start color
-  static const Color cardGradientStart = Color.fromARGB(255, 32, 29, 73);
+  /// Warning/attention color - Bright amber
+  static const Color warningAmber = Color(0xFFFFB800);
   
-  /// Card gradient end color
-  static const Color cardGradientEnd = Color.fromARGB(255, 33, 27, 121);
+  /// Text color for primary content - Pure white
+  static const Color primaryTextColor = Color(0xFFFFFFFF);
+  
+  /// Text color for secondary content - Light gray with blue tint
+  static const Color secondaryTextColor = Color(0xFFB8C5D6);
+  
+  /// Card gradient start color - Deep purple
+  static const Color cardGradientStart = Color(0xFF1A0E3E);
+  
+  /// Card gradient end color - Deep blue
+  static const Color cardGradientEnd = Color(0xFF0D1B3A);
   
   // ==================== TYPOGRAPHY ====================
   
