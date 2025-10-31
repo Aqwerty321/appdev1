@@ -6,6 +6,7 @@
 /// 2. Save this file
 /// 3. Hot reload (press 'r' in terminal or click hot reload button)
 /// 4. Changes will apply across the entire app
+library;
 
 import 'package:flutter/material.dart';
 

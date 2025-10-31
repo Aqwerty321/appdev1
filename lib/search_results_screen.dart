@@ -17,9 +17,9 @@ class SearchResultsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FirestoreService _firestoreService = FirestoreService();
+    final FirestoreService firestoreService = FirestoreService();
     return StreamBuilder<List<BuddyProfile>>(
-      stream: _firestoreService.watchAllUsers(),
+      stream: firestoreService.watchAllUsers(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
